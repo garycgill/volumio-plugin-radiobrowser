@@ -1,0 +1,21 @@
+{
+  "name": "radiobrowser",
+  "version": "1.0.0",
+  "description": "Internet radio plugin using the RadioBrowser database with 50000+ stations",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "garycgill",
+  "license": "MIT",
+  "volumio_info": {
+    "prettyName": "RadioBrowser",
+    "icon": "fa-radio",
+    "plugin_type": "music_service",
+    "boot_priority": 1
+  },
+  "dependencies": {
+    "v-conf": "^1.4.0",
+    "node-fetch": "^2.6.7"
+  }
+}

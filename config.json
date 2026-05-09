@@ -1,0 +1,14 @@
+{
+  "enabled": {
+    "type": "boolean",
+    "value": true
+  },
+  "country": {
+    "type": "string",
+    "value": ""
+  },
+  "language": {
+    "type": "string",
+    "value": ""
+  }
+}

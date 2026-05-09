@@ -1,0 +1,30 @@
+{
+  "page": {
+    "label": "RadioBrowser Settings"
+  },
+  "sections": [
+    {
+      "id": "section_settings",
+      "element": "section",
+      "label": "Settings",
+      "icon": "fa-radio",
+      "onSave": {
+        "type": "controller",
+        "endpoint": "music_service/radiobrowser",
+        "method": "saveConfig"
+      },
+      "saveButton": {
+        "label": "Save",
+        "data": []
+      },
+      "content": [
+        {
+          "id": "enabled",
+          "element": "switch",
+          "label": "Enable RadioBrowser",
+          "value": true
+        }
+      ]
+    }
+  ]
+}
