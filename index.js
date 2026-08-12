@@ -51,6 +51,7 @@ ControllerRadioBrowser.prototype.addToBrowseSources = function() {
 ControllerRadioBrowser.prototype.handleBrowseUri = function(curUri) {
   var self = this;
   var defer = libQ.defer();
+  self.logger.info("RadioBrowser handleBrowseUri called with: " + curUri);
 
   if (curUri === 'radiobrowser') {
     defer.resolve({
@@ -109,15 +110,26 @@ ControllerRadioBrowser.prototype.handleBrowseUri = function(curUri) {
 
 ControllerRadioBrowser.prototype.getTopStations = function() {
   var self = this;
-  return fetch(RADIOBROWSER_API + '/stations/topclick/100')
+  var defer = libQ.defer();
+  self.logger.info('RadioBrowser: fetching top stations');
+  fetch(RADIOBROWSER_API + '/stations/topclick/100')
     .then(function(res) { return res.json(); })
     .then(function(stations) {
-      return self.formatStationList(stations, 'Top 100 Stations');
+      self.logger.info('RadioBrowser: got ' + stations.length + ' stations');
+      var result = self.formatStationList(stations, 'Top 100 Stations');
+      self.logger.info('RadioBrowser: resolving with result');
+      defer.resolve(result);
+    })
+    .catch(function(err) {
+      self.logger.error('RadioBrowser: getTopStations error: ' + err);
+      defer.reject(err);
     });
+  return defer.promise;
 };
 
 ControllerRadioBrowser.prototype.getCountries = function() {
-  return fetch(RADIOBROWSER_API + '/countries')
+  var defer = libQ.defer();
+  fetch(RADIOBROWSER_API + '/countries')
     .then(function(res) { return res.json(); })
     .then(function(countries) {
       var items = countries
@@ -131,12 +143,13 @@ ControllerRadioBrowser.prototype.getCountries = function() {
             uri: 'radiobrowser/country/' + encodeURIComponent(c.name)
           };
         });
-      return { navigation: { lists: [{ title: 'Countries', items: items }] } };
+      defer.resolve({ navigation: { prevUri: 'radiobrowser', lists: [{ title: 'Countries', availableListViews: ['list'], items: items }] } });
     });
 };
 
 ControllerRadioBrowser.prototype.getTags = function() {
-  return fetch(RADIOBROWSER_API + '/tags?limit=200&order=stationcount&reverse=true')
+  var defer = libQ.defer();
+  fetch(RADIOBROWSER_API + '/tags?limit=200&order=stationcount&reverse=true')
     .then(function(res) { return res.json(); })
     .then(function(tags) {
       var items = tags
@@ -149,7 +162,7 @@ ControllerRadioBrowser.prototype.getTags = function() {
             uri: 'radiobrowser/tag/' + encodeURIComponent(t.name)
           };
         });
-      return { navigation: { lists: [{ title: 'Genres', items: items }] } };
+      defer.resolve({ navigation: { prevUri: 'radiobrowser', lists: [{ title: 'Genres', availableListViews: ['list'], items: items }] } });
     });
 };
 
@@ -177,16 +190,25 @@ ControllerRadioBrowser.prototype.formatStationList = function(stations, title) {
     .map(function(s) {
       return {
         service: 'radiobrowser',
-        type: 'mywebradio',
+        type: 'webradio',
         title: s.name,
         artist: s.country || '',
         album: s.tags || '',
-        icon: 'fa fa-radio',
+        icon: 'fa fa-microphone',
         albumart: s.favicon || '',
         uri: 'radiobrowser/play/' + encodeURIComponent(s.url_resolved)
       };
     });
-  return { navigation: { lists: [{ title: title, items: items }] } };
+  return {
+    navigation: {
+      prevUri: 'radiobrowser',
+      lists: [{
+        title: title,
+        availableListViews: ['list'],
+        items: items
+      }]
+    }
+  };
 };
 
 ControllerRadioBrowser.prototype.explodeUri = function(data) {
@@ -194,16 +216,17 @@ ControllerRadioBrowser.prototype.explodeUri = function(data) {
   var defer = libQ.defer();
   var uri = (typeof data === 'string') ? data : data.uri;
   var url = decodeURIComponent(uri.replace('radiobrowser/play/', ''));
-  var result = (typeof data === 'object') ? data : {};
-  result.uri = url;
-  result.service = 'webradio';
-  result.type = 'track';
-  if (!result.name && result.title) {
-    result.name = result.title;
-  }
-  if (!result.albumart) {
-    result.albumart = '/albumart';
-  }
+  var result = {
+    uri: url,
+    service: 'mpd',
+    type: 'track',
+    trackType: 'webradio',
+    name: data.title || url,
+    title: data.title || url,
+    artist: data.artist || '',
+    album: data.album || '',
+    albumart: data.albumart || '/albumart'
+  };
   defer.resolve(result);
   return defer.promise;
 };
@@ -245,4 +268,50 @@ ControllerRadioBrowser.prototype.search = function(query) {
         items: result.navigation.lists[0].items
       }];
     });
+};
+
+ControllerRadioBrowser.prototype.clearAddPlayTrack = function(track) {
+  var self = this;
+  self.commandRouter.pushConsoleMessage('[' + Date.now() + '] ' + 'ControllerRadioBrowser::clearAddPlayTrack');
+  var safeUri = track.uri.replace(/"/g, '\\"');
+  return self.mpdPlugin.sendMpdCommand('stop', [])
+    .then(function() {
+      return self.mpdPlugin.sendMpdCommand('clear', []);
+    })
+    .then(function() {
+      return self.mpdPlugin.sendMpdCommand('add "' + safeUri + '"', []);
+    })
+    .then(function() {
+      return self.mpdPlugin.sendMpdCommand('play', []);
+    });
+};
+
+ControllerRadioBrowser.prototype.stop = function() {
+  var self = this;
+  return self.mpdPlugin.sendMpdCommand('stop', []);
+};
+
+ControllerRadioBrowser.prototype.pause = function() {
+  var self = this;
+  return self.mpdPlugin.sendMpdCommand('pause', []);
+};
+
+ControllerRadioBrowser.prototype.resume = function() {
+  var self = this;
+  return self.mpdPlugin.sendMpdCommand('play', []);
+};
+
+ControllerRadioBrowser.prototype.seek = function(position) {
+  var self = this;
+  return self.mpdPlugin.seek(position);
+};
+
+ControllerRadioBrowser.prototype.next = function() {
+  var self = this;
+  return self.mpdPlugin.sendMpdCommand('next', []);
+};
+
+ControllerRadioBrowser.prototype.previous = function() {
+  var self = this;
+  return self.mpdPlugin.sendMpdCommand('previous', []);
 };
