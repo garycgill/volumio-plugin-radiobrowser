@@ -86,3 +86,13 @@ volumio plugin install    # Install plugin locally
 volumio vrestart          # Restart Volumio service
 journalctl -f             # Live logs
 ```
+
+## Lessons Learned (August 2026 update after Volumio update)
+
+- After a Volumio OS update the plugin is wiped from /data/plugins/ — reinstall from GitHub
+- npm modules must be reinstalled in /data/plugins/music_service/radiobrowser/ after reinstall
+- node-fetch returns native Promises incompatible with Volumio's kew library — always wrap fetch calls in libQ.defer()
+- Navigation results must include prevUri and availableListViews or the UI won't render lists
+- Plugin MUST implement clearAddPlayTrack, stop, pause, resume, seek, next, previous methods or Volumio's state machine won't update the UI
+- git config --global user.email and user.name must be reset after each Volumio OS update
+- GitHub Personal Access Token needed for git push — password authentication not supported
