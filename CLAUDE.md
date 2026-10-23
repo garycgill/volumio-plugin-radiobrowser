@@ -105,3 +105,8 @@ journalctl -f             # Live logs
 - git credential.helper store enabled — token saved in ~/.git-credentials (plain text; may be wiped by OS update)
 - After this update the device became unreachable (SSH timeout) and needed a power cycle; fine afterwards
 - /var/log is tmpfs (RAM) — logs lost on reboot; check journalctl BEFORE power-cycling after a hang
+- CAUSE OF POST-UPDATE PAUSES (Oct 2026): Wi-Fi had been (re)enabled — device was on BOTH eth0 (192.168.84.41)
+     and wlan0 (192.168.82.35) with two default routes. Wi-Fi renewals triggered ip-changed events and VLAN 82
+     clients (HA, FiiO) were routed asymmetrically. FIX: Settings > Network > Wireless OFF.
+     After every Volumio update: check `ip -br a | grep wlan0` shows DOWN and `ip route` has one default.
+
