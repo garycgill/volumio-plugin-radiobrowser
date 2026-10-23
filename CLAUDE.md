@@ -3,8 +3,8 @@
 ## Device
 - **Device:** Volumio Riva+ (MP1)
 - **Architecture:** ARM64 (aarch64)
-- **OS:** Debian Buster
-- **Volumio Version:** 3.0
+- **OS:** Debian 12 (Bookworm)
+- **Volumio Version:** 4.231 (Oct 2026)
 - **Kernel:** 4.9.241
 - **IP Address:** 192.168.84.41 (may change - check router if unreachable)
 - **SSH:** `ssh volumio@192.168.84.41` (password: volumio)
@@ -96,3 +96,7 @@ journalctl -f             # Live logs
 - Plugin MUST implement clearAddPlayTrack, stop, pause, resume, seek, next, previous methods or Volumio's state machine won't update the UI
 - git config --global user.email and user.name must be reset after each Volumio OS update
 - GitHub Personal Access Token needed for git push — password authentication not supported
+
+## Oct 2026 update (Volumio 4.231, Bookworm)
+- Plugin, node_modules, dev folder and rtlsdr_radio all SURVIVED this update (unlike Aug 2026)
+- Pre-update routine: sync index.js to dev folder, confirm git is pushed, tar plugins+config to /tmp and scp off-device
