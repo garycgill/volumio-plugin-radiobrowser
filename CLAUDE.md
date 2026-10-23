@@ -1,7 +1,7 @@
 # Volumio RadioBrowser Plugin - Project Context
 
 ## Device
-- **Device:** Volumio Riva+ (MP1)
+- **Device:** Volumio Riva+ (MP1) — board: Khadas VIM3L (Amlogic S905D3, 4 cores, 2GB RAM)
 - **Architecture:** ARM64 (aarch64)
 - **OS:** Debian 12 (Bookworm)
 - **Volumio Version:** 4.231 (Oct 2026)
@@ -104,3 +104,4 @@ journalctl -f             # Live logs
   Contents: Read and write (fine-grained) or "repo" scope (classic) — 403 = token lacks write permission
 - git credential.helper store enabled — token saved in ~/.git-credentials (plain text; may be wiped by OS update)
 - After this update the device became unreachable (SSH timeout) and needed a power cycle; fine afterwards
+- /var/log is tmpfs (RAM) — logs lost on reboot; check journalctl BEFORE power-cycling after a hang
