@@ -49,7 +49,7 @@
   - `~/volumio-plugin-radiobrowser/` (dev)
   - `/data/plugins/music_service/radiobrowser/` (installed)
   - If plugin fails with `Cannot find module`, run `npm install kew node-fetch v-conf` in the installed folder
-- **volumio plugin enable/disable** commands are not available in Volumio 3 CLI
+- **volumio plugin enable/disable** commands are not available in Volumio 3 or 4 CLI (confirmed 4.231)
   - Use the web UI instead: `http://volumio.local` → Settings → Plugins
 - **SSH enable** must be toggled at `http://volumio.local/dev` after each factory reset
 - **Python replacement** of code blocks can fail silently - always verify with `sed -n` after edits
