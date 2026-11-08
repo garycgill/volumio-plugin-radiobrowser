@@ -4,7 +4,7 @@
 - **Device:** Volumio Riva+ (MP1) — board: Khadas VIM3L (Amlogic S905D3, 4 cores, 2GB RAM)
 - **Architecture:** ARM64 (aarch64)
 - **OS:** Debian 12 (Bookworm)
-- **Volumio Version:** 4.231 (Oct 2026)
+- **Volumio Version:** 4.244 (Nov 2026)
 - **Kernel:** 4.9.241
 - **IP Address:** 192.168.84.41 (may change - check router if unreachable)
 - **SSH:** `ssh volumio@192.168.84.41` (password: volumio)
@@ -110,3 +110,10 @@ journalctl -f             # Live logs
      clients (HA, FiiO) were routed asymmetrically. FIX: Settings > Network > Wireless OFF.
      After every Volumio update: check `ip -br a | grep wlan0` shows DOWN and `ip route` has one default.
 
+
+## Nov 2026 update (Volumio 4.231 -> 4.244)
+- Pre-update: index.js synced (git already clean/pushed); backup volumio-backup-20261108.tar.gz
+  (9.6MB: /data/configuration, /data/plugins, dev folder, git config) copied to NAS /mnt/nas/backup/volumio/
+  (needs sudo on the UDOO — NAS backup share is root-owned)
+- Result: rebooted by itself (no power cycle needed), radiobrowser + rtlsdr_radio + podcast survived,
+  Wi-Fi stayed DOWN, single default route via eth0, git config survived
